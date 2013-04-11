@@ -36,6 +36,7 @@ module RailsAdmin
         scope = scope.merge(auth_scope)
       end
       scope = scope.instance_eval(&additional_scope) if additional_scope
+      scope = scope.unscoped
 
       get_collection(model_config, scope, pagination)
     end
