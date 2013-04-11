@@ -11,6 +11,7 @@ module RailsAdmin
     before_filter :get_model, :except => RailsAdmin::Config::Actions.all(:root).map(&:action_name)
     before_filter :get_object, :only => RailsAdmin::Config::Actions.all(:member).map(&:action_name)
     before_filter :check_for_cancel
+    before_filter :check_for_no_delete_current_user, :only => [:delete]
 
     RailsAdmin::Config::Actions.all.each do |action|
       class_eval %{
@@ -125,6 +126,10 @@ module RailsAdmin
       if params[:_continue] || (params[:bulk_action] && !params[:bulk_ids])
         redirect_to(back_or_index, :flash => { :info => t("admin.flash.noaction") })
       end
+    end
+
+    def check_for_no_delete_current_user
+      redirect_to '/admin/user', :flash => { :info => t("admin.flash.error_for_delete_user") } if current_user == @object
     end
 
     def get_collection(model_config, scope, pagination)
